@@ -1,0 +1,17 @@
+{
+  "name": "film-cord-http",
+  "version": "1.0.0",
+  "description": "A discord bot built using HTTP interactions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node index.js"
+  },
+  "author": "FragsterDev",
+  "license": "ISC",
+  "dependencies": {
+    "discord-interactions": "^4.0.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1"
+  }
+}
