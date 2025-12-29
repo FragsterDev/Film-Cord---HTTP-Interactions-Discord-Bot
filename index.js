@@ -92,6 +92,10 @@ app.post(
   }
 );
 
+app.get("/", (req, res) => {
+  res.send("Bot is up and running.");
+});
+
 app.listen(port, () => {
   console.log(`Listening for requests on ${port}`);
 });
