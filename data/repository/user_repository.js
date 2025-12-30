@@ -31,7 +31,7 @@ async function createUserIfNotExists(username, id) {
   return rows[0];
 }
 
-async function insertIntoList(
+async function addListItem(
   user_id,
   item_type,
   tmdb_id,
@@ -63,7 +63,7 @@ async function insertIntoList(
   return rows[0];
 }
 
-async function deleteListItem(user_id, list_type, item_type, tmdb_id) {
+async function removeListItem(user_id, list_type, item_type, tmdb_id) {
   const sql = `
     DELETE FROM user_lists
     WHERE user_id = $1
@@ -81,3 +81,40 @@ async function deleteListItem(user_id, list_type, item_type, tmdb_id) {
 
   return rows[0];
 }
+
+async function listItemExists(user_id, list_type, item_type, tmdb_id) {
+  const sql = `
+    SELECT 1
+    FROM user_lists
+    WHERE user_id = $1
+      AND list_type = $2
+      AND item_type = $3
+      AND tmdb_id = $4
+    LIMIT 1
+  `;
+  const { rows } = await query(sql, [user_id, list_type, item_type, tmdb_id]);
+  return rows.length > 0;
+}
+
+async function getListItems(user_id, list_type, item_type) {
+  const sql = `
+  SELECT * FROM user_lists
+  WHERE user_id = $1
+  AND list_type = $2
+  AND item_type = $3
+  ORDER BY created_at DESC;
+  `;
+
+  const { rows } = await query(sql, [user_id, list_type, item_type]);
+
+  return rows;
+}
+
+module.exports = {
+  getUserByID,
+  createUserIfNotExists,
+  addListItem,
+  removeListItem,
+  listItemExists,
+  getListItems,
+};
