@@ -10,7 +10,7 @@ const {
 
 const singleTVEmbedBuilder = require("../../helpers/embed_builders/tv_info_embed");
 const searchEmbedBuilder = require("../../helpers/embed_builders/search_embed");
-const paginationButtons = require("../../helpers/components/pagination_buttons");
+const paginationButtons = require("../../ui/components/pagination_buttons.js");
 const editOriginalInteraction = require("../../helpers/edit_response/edit_interaction");
 
 const tvCommandData = {

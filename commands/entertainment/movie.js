@@ -10,8 +10,9 @@ const {
 
 const singleMovieEmbedBuilder = require("../../helpers/embed_builders/movie_info_embed");
 const searchEmbedBuilder = require("../../helpers/embed_builders/search_embed");
-const paginationButtons = require("../../helpers/components/pagination_buttons");
+const paginationButtons = require("../../ui/components/pagination_buttons.js");
 const editOriginalInteraction = require("../../helpers/edit_response/edit_interaction");
+const listButtons = require("../../ui/components/list_buttons.js");
 
 const movieCommandData = {
   type: 1,
@@ -63,8 +64,24 @@ async function handleMovieInteraction(interaction) {
     const movie = await getMovieByID(optionsMap.id);
     const embed = singleMovieEmbedBuilder(movie, interaction);
 
+    const ownerId = interaction.member?.user?.id || interaction.user?.id;
+
+    const buttons = listButtons(
+      "movie",
+      movie.title,
+      movie.releaseDate?.split("-")[0] || "N/A",
+      movie.id,
+      ownerId
+    );
+
     return editOriginalInteraction(interaction, {
       embeds: [embed],
+      components: [
+        {
+          type: 1,
+          components: buttons,
+        },
+      ],
     });
   }
 

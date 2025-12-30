@@ -20,21 +20,34 @@ async function handleButtonEvent(interaction) {
 
   const clicker = interaction.member?.user?.id || interaction.user?.id;
 
-  // 2️⃣ Continue work
-  const [type, query, page, ownerId] = interaction.data.custom_id.split(":");
+  const buttonType = interaction.data.custom_id.split(":")[0];
 
-  if (ownerId !== clicker) {
-    return;
-  }
+  if (buttonType === "pagination") {
+    // 2️⃣ Continue with pagination
+    const [buttonType, type, query, page, ownerId] =
+      interaction.data.custom_id.split(":");
 
-  const pageNumber = Number(page);
+    if (ownerId !== clicker) {
+      return;
+    }
 
-  if (type === "movie") {
-    await handleMoviePagination(interaction, type, query, pageNumber, ownerId);
-  }
+    const pageNumber = Number(page);
 
-  if (type === "tv") {
-    await handleTVPagination(interaction, type, query, pageNumber, ownerId);
+    if (type === "movie") {
+      await handleMoviePagination(
+        interaction,
+        type,
+        query,
+        pageNumber,
+        ownerId
+      );
+    }
+
+    if (type === "tv") {
+      await handleTVPagination(interaction, type, query, pageNumber, ownerId);
+    }
+  } else if (buttonType === "list") {
+    console.log(interaction.data.custom_id.split(":"));
   }
 }
 

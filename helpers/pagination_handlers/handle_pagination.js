@@ -4,7 +4,7 @@ const {
 
 const { searchTVByQuery } = require("../../services/tmdb_service/tv_service");
 
-const paginationButtons = require("../components/pagination_buttons");
+const paginationButtons = require("../../ui/components/pagination_buttons");
 const editOriginalInteraction = require("../edit_response/edit_interaction");
 const searchEmbedBuilder = require("../embed_builders/search_embed");
 
