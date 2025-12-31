@@ -5,8 +5,14 @@ const {
   handleTVPagination,
 } = require("../pagination_handlers/handle_pagination.js");
 
+const {
+  createUserIfNotExists,
+  addListItem,
+} = require("../../data/repository/user_repository.js");
+const sendEphmeralResponse = require("../interaction_response/ephmeral_response/send_ephmeral_response.js");
+
 async function handleButtonEvent(interaction) {
-  // 1️⃣ ACK IMMEDIATELY
+  // 1️⃣ ACK IMMEDIATELY (required)
   await fetch(
     `https://discord.com/api/v10/interactions/${interaction.id}/${interaction.token}/callback`,
     {
@@ -18,36 +24,73 @@ async function handleButtonEvent(interaction) {
     }
   );
 
-  const clicker = interaction.member?.user?.id || interaction.user?.id;
+  const userObj = interaction.member?.user || interaction.user;
+  const clickerId = userObj.id;
 
-  const buttonType = interaction.data.custom_id.split(":")[0];
+  // Split ONCE
+  const parts = interaction.data.custom_id.split(":");
+  const buttonType = parts[0];
 
+  // ───────────── PAGINATION ─────────────
   if (buttonType === "pagination") {
-    // 2️⃣ Continue with pagination
-    const [buttonType, type, query, page, ownerId] =
-      interaction.data.custom_id.split(":");
+    const [, mediaType, query, page, ownerId] = parts;
 
-    if (ownerId !== clicker) {
-      return;
-    }
+    if (ownerId !== clickerId) return;
 
     const pageNumber = Number(page);
 
-    if (type === "movie") {
-      await handleMoviePagination(
+    if (mediaType === "movie") {
+      return handleMoviePagination(
         interaction,
-        type,
+        mediaType,
         query,
         pageNumber,
         ownerId
       );
     }
 
-    if (type === "tv") {
-      await handleTVPagination(interaction, type, query, pageNumber, ownerId);
+    if (mediaType === "tv") {
+      return handleTVPagination(
+        interaction,
+        mediaType,
+        query,
+        pageNumber,
+        ownerId
+      );
     }
-  } else if (buttonType === "list") {
-    console.log(interaction.data.custom_id.split(":"));
+  }
+
+  // ───────────── LIST BUTTONS ─────────────
+  if (buttonType === "list") {
+    const [, list_type, item_type, title, year, tmdb_id, owner_id] = parts;
+
+    // 🔒 Only owner can click
+    if (owner_id !== clickerId) return;
+
+    // Ensure user exists
+    const user = await createUserIfNotExists(
+      userObj.username,
+      Number(owner_id)
+    );
+
+    // Insert into DB
+    const result = await addListItem(
+      user.id,
+      item_type,
+      Number(tmdb_id),
+      title,
+      Number(year),
+      list_type
+    );
+
+    const options = {
+      content: result
+        ? `**${title} (${year})** added to **${list_type}**`
+        : `**${title} (${year})** is already in **${list_type}**`,
+      flags: 64, // EPHEMERAL
+    };
+
+    sendEphmeralResponse(interaction, options);
   }
 }
 

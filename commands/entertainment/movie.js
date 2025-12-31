@@ -11,7 +11,7 @@ const {
 const singleMovieEmbedBuilder = require("../../helpers/embed_builders/movie_info_embed");
 const searchEmbedBuilder = require("../../helpers/embed_builders/search_embed");
 const paginationButtons = require("../../ui/components/pagination_buttons.js");
-const editOriginalInteraction = require("../../helpers/edit_response/edit_interaction");
+const editOriginalInteraction = require("../../helpers/interaction_response/edit_response/edit_interaction.js");
 const listButtons = require("../../ui/components/list_buttons.js");
 
 const movieCommandData = {
