@@ -9,6 +9,7 @@ const {
   createUserIfNotExists,
   addListItem,
 } = require("../../data/repository/user_repository.js");
+
 const sendEphmeralResponse = require("../interaction_response/ephmeral_response/send_ephmeral_response.js");
 
 async function handleButtonEvent(interaction) {
@@ -40,23 +41,25 @@ async function handleButtonEvent(interaction) {
     const pageNumber = Number(page);
 
     if (mediaType === "movie") {
-      return handleMoviePagination(
+      await handleMoviePagination(
         interaction,
         mediaType,
         query,
         pageNumber,
         ownerId
       );
+      return;
     }
 
     if (mediaType === "tv") {
-      return handleTVPagination(
+      await handleTVPagination(
         interaction,
         mediaType,
         query,
         pageNumber,
         ownerId
       );
+      return;
     }
   }
 
@@ -90,7 +93,8 @@ async function handleButtonEvent(interaction) {
       flags: 64, // EPHEMERAL
     };
 
-    sendEphmeralResponse(interaction, options);
+    await sendEphmeralResponse(interaction, options);
+    return;
   }
 }
 

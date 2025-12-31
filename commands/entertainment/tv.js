@@ -12,6 +12,7 @@ const singleTVEmbedBuilder = require("../../helpers/embed_builders/tv_info_embed
 const searchEmbedBuilder = require("../../helpers/embed_builders/search_embed");
 const paginationButtons = require("../../ui/components/pagination_buttons.js");
 const editOriginalInteraction = require("../../helpers/interaction_response/edit_response/edit_interaction.js");
+const listButtons = require("../../ui/components/list_buttons.js");
 
 const tvCommandData = {
   type: 1,
@@ -58,13 +59,29 @@ async function handleTVInteraction(interaction) {
     options.map((opt) => [opt.name, opt.value])
   );
 
+  const ownerId = interaction.member?.user?.id || interaction.user?.id;
+
   // ID takes priority
   if (optionsMap.id) {
     const tvShow = await getTVByID(optionsMap.id);
     const embed = singleTVEmbedBuilder(tvShow, interaction);
 
+    const buttons = listButtons(
+      "tv",
+      tvShow.name,
+      tvShow.firstAirDate?.split("-")[0] || "N/A",
+      tvShow.id,
+      ownerId
+    );
+
     return editOriginalInteraction(interaction, {
       embeds: [embed],
+      components: [
+        {
+          type: 1,
+          components: buttons,
+        },
+      ],
     });
   }
 
@@ -80,13 +97,27 @@ async function handleTVInteraction(interaction) {
       });
     }
 
-    // Single result
+    // Single result → show directly
     if (results.length === 1) {
       const tvShow = await getTVByID(results[0].id);
       const embed = singleTVEmbedBuilder(tvShow, interaction);
 
+      const buttons = listButtons(
+        "tv",
+        tvShow.name,
+        tvShow.firstAirDate?.split("-")[0] || "N/A",
+        tvShow.id,
+        ownerId
+      );
+
       return editOriginalInteraction(interaction, {
         embeds: [embed],
+        components: [
+          {
+            type: 1,
+            components: buttons,
+          },
+        ],
       });
     }
 
@@ -95,8 +126,6 @@ async function handleTVInteraction(interaction) {
     const totalPages = Math.ceil(results.length / 10);
 
     const searchEmbed = searchEmbedBuilder(results, title, page, totalPages);
-
-    const ownerId = interaction.member?.user?.id || interaction.user?.id;
 
     const buttons = paginationButtons("tv", title, page, totalPages, ownerId);
 
